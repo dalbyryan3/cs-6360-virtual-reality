@@ -1,0 +1,50 @@
+/**
+ * @file Phong vertex shader only with point lights
+ *
+ * @copyright The Board of Trustees of the Leland Stanford Junior University
+ * @version 2021/04/01
+ */
+
+/* TODO (2.2.1) */
+
+var shaderID = "vShaderPhong";
+
+var shader = document.createTextNode( `
+/**
+ * varying qualifier is used for passing variables from a vertex shader
+ * to a fragment shader. In the fragment shader, these variables are
+ * interpolated between neighboring vertexes.
+ */
+varying vec3 normalCam; // Normal in view coordinate
+varying vec3 fragPosCam; // Vertex/Fragment position in view cooridnate
+
+uniform mat4 modelViewMat;
+uniform mat4 projectionMat;
+uniform mat3 normalMat;
+
+attribute vec3 position;
+attribute vec3 normal;
+
+void main() {
+	// Transform to view space
+	vec3 normalVecView = normalize(normalMat * normal); // Object space to view space for vector
+	vec3 vertPosView = vec3(modelViewMat * vec4(position, 1.0)); // Object space to view space for point
+
+	normalCam = normalVecView;
+	fragPosCam = vertPosView;
+
+	gl_Position = projectionMat * modelViewMat * vec4( position, 1.0 );
+
+}
+` );
+
+
+var shaderNode = document.createElement( "script" );
+
+shaderNode.id = shaderID;
+
+shaderNode.setAttribute( "type", "x-shader/x-vertex" );
+
+shaderNode.appendChild( shader );
+
+document.body.appendChild( shaderNode );
