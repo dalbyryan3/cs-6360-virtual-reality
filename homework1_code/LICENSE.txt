@@ -1,0 +1,4 @@
+This code is used with permission from Gordon Wetzstein <gordon.wetzstein@stanford.edu>
+The previous C++/OpenGL version was developed by Robert Konrad in 2016, and the JavaScript/WebGL version was developed by Hayato Ikoma in 2017.
+
+Copyright The Board of Trustees of the Leland Stanford Junior University. All rights reserved.
