@@ -25,7 +25,7 @@
 // Length of the monitor's diagonal in [inch]
 // (ex. Macbook Pro 13" => 13.3 inch
 //      Macbook Pro 15" => 15.4 inch
-var screenDiagonal = 27;
+var screenDiagonal = 13.3;
 
 // Distance between the viewer and the monitor in [mm]
 var distanceScreenViewer = 800.0;
