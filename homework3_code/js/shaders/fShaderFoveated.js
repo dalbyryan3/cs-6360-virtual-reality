@@ -24,7 +24,7 @@ varying vec2 textureCoords;
 uniform sampler2D textureMap;
 
 // resolution of the window in [pixels]
-uniform vec2 windowSize;
+uniform vec2 windowSize; // width, height 
 
 // window space coordinates of gaze position in [pixels]
 uniform vec2 gazePosition;
@@ -50,11 +50,38 @@ uniform float middleBlurKernel[int(middleKernelRad)*2+1];
 // gaussian blur kernel for outer layer (9x9)
 uniform float outerBlurKernel[int(outerKernelRad)*2+1];
 
-
 void main() {
 
 	gl_FragColor = texture2D( textureMap,  textureCoords );
 
+	// Calculate e of fragment 
+	float e = distance(gazePosition, textureCoords*windowSize) * pixelVA;
+
+	if (e > e2)
+	{
+		gl_FragColor.rgb=vec3(0);
+		for (int i=-int(outerKernelRad); i<=int(outerKernelRad); i++)
+		{
+			for (int j=-int(outerKernelRad); j<=int(outerKernelRad); j++)
+			{
+				// Can make 2D gaussian kernel out of kernel array outer product 
+				gl_FragColor.rgb += (outerBlurKernel[i+int(outerKernelRad)]*outerBlurKernel[j+int(outerKernelRad)]) * texture2D(textureMap, vec2(textureCoords.x + float(i)/windowSize.x, textureCoords.y + float(j)/windowSize.y)).rgb; 
+			}
+		}
+	}
+	else if (e > e1)
+	{
+		gl_FragColor.rgb=vec3(0);
+		for (int i=-int(middleKernelRad); i<=int(middleKernelRad); i++)
+		{
+			for (int j=-int(middleKernelRad); j<=int(middleKernelRad); j++)
+			{
+				// Can make 2D gaussian kernel out of kernel array outer product 
+				gl_FragColor.rgb += (middleBlurKernel[i+int(middleKernelRad)]*middleBlurKernel[j+int(middleKernelRad)]) * texture2D(textureMap, vec2(textureCoords.x + float(i)/windowSize.x, textureCoords.y + float(j)/windowSize.y)).rgb; 
+			}
+		}
+	}
+	// Otherwise won't blur
 }
 ` );
 
