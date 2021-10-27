@@ -75,15 +75,35 @@ var MVPmat = function ( dispParams ) {
 		var viewerUp = new THREE.Vector3( 0, 1, 0 );
 
 		var translationMat
-	   = new THREE.Matrix4().makeTranslation(
+	    = new THREE.Matrix4().makeTranslation(
 			 - viewerPosition.x,
 			 - viewerPosition.y,
 			 - viewerPosition.z );
 
-		var rotationMat = new THREE.Matrix4().lookAt( viewerPosition, viewerTarget, viewerUp ).transpose();
+		var rotationMat = lookAt(viewerPosition, viewerTarget, viewerUp);
 
-		return new THREE.Matrix4().premultiply( translationMat ).premultiply( rotationMat );
+		var stereoMat = new THREE.Matrix4().makeTranslation(
+			halfIpdShift,
+			0,
+			0 );
 
+		return new THREE.Matrix4().premultiply( translationMat ).premultiply( rotationMat ).premultiply( stereoMat );
+
+	}
+
+	function lookAt(viewerPosition, viewerTarget, viewerUp) {
+		var g = viewerTarget.clone().sub(viewerPosition);
+		var c_hat = g.clone().normalize();
+		var z_hat = c_hat.clone().multiplyScalar(-1);
+		var x_hat = viewerUp.clone().cross(z_hat).normalize();
+		var y_hat = z_hat.clone().cross(x_hat);
+		var rotationMat = new THREE.Matrix4().set(
+			x_hat.x, x_hat.y, x_hat.z, 0,
+			y_hat.x, y_hat.y, y_hat.z, 0,
+			z_hat.x, z_hat.y, z_hat.z, 0,
+			0, 0, 0, 1 );
+
+		return rotationMat;
 	}
 
 	// A function to compute a perspective projection matrix based on the
@@ -150,23 +170,23 @@ var MVPmat = function ( dispParams ) {
 			/* TODO (2.4.2) Projection Matrix Computation */
 
 			// Compute projection matrix
-			var right =
-				( dispParams.canvasWidth * dispParams.pixelPitch / 2 )
-					* ( state.clipNear / dispParams.distanceScreenViewer );
+			var eyeL_right = state.clipNear * ((dispParams.canvasWidth*dispParams.pixelPitch + dispParams.ipd) / (2 * dispParams.distanceScreenViewer));
 
-			var left = - right;
+			var eyeL_left = -state.clipNear * ((dispParams.canvasWidth*dispParams.pixelPitch - dispParams.ipd) / (2 * dispParams.distanceScreenViewer));
 
-			var top =
-				( dispParams.canvasHeight * dispParams.pixelPitch / 2 )
-					* ( state.clipNear / dispParams.distanceScreenViewer );
+			var eyeR_right = state.clipNear * ((dispParams.canvasWidth*dispParams.pixelPitch - dispParams.ipd) / (2 * dispParams.distanceScreenViewer));
 
-			var bottom = - top;
+			var eyeR_left = -state.clipNear * ((dispParams.canvasWidth*dispParams.pixelPitch + dispParams.ipd) / (2 * dispParams.distanceScreenViewer));
+
+			var top = state.clipNear * (dispParams.canvasHeight*dispParams.pixelPitch / (2 * dispParams.distanceScreenViewer));
+
+			var bottom = -top; 
 
 			this.anaglyphProjectionMat.L = computePerspectiveTransform(
-				left, right, top, bottom, state.clipNear, state.clipFar );
+				eyeL_left, eyeL_right, top, bottom, state.clipNear, state.clipFar );
 
 			this.anaglyphProjectionMat.R = computePerspectiveTransform(
-				left, right, top, bottom, state.clipNear, state.clipFar );
+				eyeR_left, eyeR_right, top, bottom, state.clipNear, state.clipFar );
 
 		}
 

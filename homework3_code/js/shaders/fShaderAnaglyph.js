@@ -27,10 +27,15 @@ uniform sampler2D textureMapL;
 // Texture map for the right eye
 uniform sampler2D textureMapR;
 
+float computeGrayscale(vec3 rgbVec){
+	return 0.2989*rgbVec.r + 0.5870*rgbVec.g + 0.1140*rgbVec.b;
+}
+
 void main() {
-
-	gl_FragColor = texture2D( textureMapL,  textureCoords );
-
+	gl_FragColor.r = computeGrayscale(texture2D( textureMapL,  textureCoords ).rgb);
+	float gbVal = computeGrayscale(texture2D( textureMapR,  textureCoords ).rgb);
+	gl_FragColor.g = gbVal;
+	gl_FragColor.b = gbVal;
 }
 ` );
 
