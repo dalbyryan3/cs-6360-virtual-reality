@@ -46,16 +46,6 @@ uniform float pixelPitch;
 
 const float searchRad = 11.0;
 
-
-// vec4 windowToViewSpace( vec2 p ) {
-// 	vec2 xyNDC = (p - (windowSize*0.5)) / (windowSize*0.5);
-// 	float zNDC = 2.0*(texture2D(depthMap, p).r) - 1.0;
-// 	vec3 vNDC = vec3(xyNDC, zNDC);
-// 	float wClip = projectionMat[3][2] / (zNDC - projectionMat[2][2]);
-// 	vec4 vClip = vec4(wClip*vNDC, wClip);
-// 	vec4 vView = invProjectionMat * vClip;
-// 	return vView;
-// }
 vec3 windowToViewSpace( vec2 p ) {
 	vec2 xyNDC = (p - (windowSize*0.5)) / (windowSize*0.5);
 	float zNDC = 2.0*(texture2D(depthMap, p/windowSize).r) - 1.0;
@@ -92,13 +82,14 @@ vec3 computeBlur() {
 	/* TODO (2.3.3) Retinal Blur */
 
 	float blurRadius = computeCoC(distToFrag(textureCoords*windowSize), distToFrag(gazePosition)) / pixelPitch;
+
 	vec3 final_color = vec3(0);
 	float n = 0.0;
 	for (int i = -int(searchRad); i <= int(searchRad); i++)
 	{
 		for (int j = -int(searchRad); j <= int(searchRad); j++)
 		{
-			if(float(i*i*j*j) <= blurRadius*blurRadius)
+			if(float(i*i+j*j) <= float(int(blurRadius)*int(blurRadius)))
 			{
 				final_color += texture2D(textureMap, vec2(textureCoords.x + float(i)/windowSize.x, textureCoords.y + float(j)/windowSize.y)).rgb;
 				n = n + 1.0;
@@ -106,54 +97,8 @@ vec3 computeBlur() {
 		}
 	}
 	return final_color * (1.0 / n);
-
-	// vec3 final_color = vec3(1);
-	// int blurRadiusInt = int(blurRadius);
-	// if (blurRadiusInt == 0)
-	// {
-	// 	final_color = vec3(0.0);
-	// }
-	// if (blurRadiusInt == 1)
-	// {
-	// 	final_color = vec3(0.1);
-	// }
-	// if (blurRadiusInt == 2)
-	// {
-	// 	final_color = vec3(0.2);
-	// }
-	// if (blurRadiusInt == 3)
-	// {
-	// 	final_color = vec3(0.3);
-	// }
-	// if (blurRadiusInt == 4)
-	// {
-	// 	final_color = vec3(0.4);
-	// }
-	// if (blurRadiusInt == 5)
-	// {
-	// 	final_color = vec3(0.5);
-	// }
-	// if (blurRadiusInt == 6)
-	// {
-	// 	final_color = vec3(0.6);
-	// }
-	// if (blurRadiusInt == 7)
-	// {
-	// 	final_color = vec3(0.7);
-	// }
-	// if (blurRadiusInt == 8)
-	// {
-	// 	final_color = vec3(0.8);
-	// }
-	// if (blurRadiusInt == 8)
-	// {
-	// 	final_color = vec3(0.8);
-	// }
-	// if (blurRadiusInt == 9)
-	// {
-	// 	final_color = vec3(0.9);
-	// }
-	// return final_color;
+	// Visualize blur radius
+	// return vec3(blurRadius/10.0);
 }
 
 

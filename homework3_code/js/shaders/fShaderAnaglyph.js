@@ -36,6 +36,11 @@ void main() {
 	float gbVal = computeGrayscale(texture2D( textureMapR,  textureCoords ).rgb);
 	gl_FragColor.g = gbVal;
 	gl_FragColor.b = gbVal;
+
+	// Just a test for 2.4.4
+	// gl_FragColor.r = texture2D( textureMapL,  textureCoords ).r;
+	// gl_FragColor.g = texture2D( textureMapR,  textureCoords ).g;
+	// gl_FragColor.b = texture2D( textureMapR,  textureCoords ).b;
 }
 ` );
 
