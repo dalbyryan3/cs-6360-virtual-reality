@@ -110,10 +110,27 @@ var MVPmat = function ( dispParams ) {
 	function computeTopBottomLeftRight( clipNear, clipFar, dispParams ) {
 
 		/* TODO (2.1.2) Stereo Rendering */
+		var M = dispParams.lensMagnification;
+		var d = dispParams.distanceScreenViewer;
+		var h = (dispParams.pixelPitch * dispParams.canvasHeight) * M;
+		var w1L = M * dispParams.ipd/2;
+		var w2L = M * ((dispParams.pixelPitch * dispParams.canvasWidth) - dispParams.ipd)/2;
+		var w1R = w1L;
+		var w2R = w2L;
+		var top = clipNear * h/(2*d);
+		var bottom = -top;
+		var lL = -clipNear * w2L / d;
+		var rL = clipNear * w1L / d;
+		var lR = -clipNear * w1R / d;
+		var rR = clipNear * w2R / d;
+		// console.log({
+		// 	topL: top, bottomL: bottom, leftL: lL, rightL: rL,
+		// 	topR: top, bottomR: bottom, leftR: lR, rightR: rR,
+		// });
 
 		return {
-			topL: 80, bottomL: - 80, leftL: - 80, rightL: 80,
-			topR: 80, bottomR: - 80, leftR: - 80, rightR: 80,
+			topL: top, bottomL: bottom, leftL: lL, rightL: rL,
+			topR: top, bottomR: bottom, leftR: lR, rightR: rR,
 		};
 
 	}
