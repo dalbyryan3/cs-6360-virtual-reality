@@ -139,22 +139,16 @@ var StereoUnwarpRenderer = function ( webglRenderer, dispParams ) {
 	// All the parameters you need for your calculations are found in the function arguments.
 	function computeCenterCoord( dispParams ) {
 
-		var centerCoordL_viewport_mm = new THREE.Vector2( -dispParams.ipd/2, 0 );
-		var centerCoordL_viewport_px = centerCoordL_viewport_mm.clone().divideScalar(dispParams.pixelPitch);
-		var centerCoordL_texture_coords = (centerCoordL_viewport_px.clone().add(new THREE.Vector2(dispParams.canvasWidth/2, dispParams.canvasHeight/2))).divide(new THREE.Vector2(dispParams.canvasWidth, dispParams.canvasHeight));
+		let halfIpd = dispParams.ipd / 2.0;
+		let halfIpdPx = halfIpd / dispParams.pixelPitch;
+		let singleViewportWidthPx = dispParams.canvasWidth / 2.0;
 
-		var centerCoordR_viewport_mm = new THREE.Vector2( dispParams.ipd/2, 0 );
-		var centerCoordR_viewport_px = centerCoordR_viewport_mm.clone().divideScalar(dispParams.pixelPitch);
-		var centerCoordR_texture_coords = (centerCoordR_viewport_px.clone().add(new THREE.Vector2(dispParams.canvasWidth/2, dispParams.canvasHeight/2))).divide(new THREE.Vector2(dispParams.canvasWidth, dispParams.canvasHeight));
-
-		var centerCoordL = centerCoordL_texture_coords;
-
-		var centerCoordR = centerCoordR_texture_coords;
-
-		console.log({ L: centerCoordL, R: centerCoordR });
+		let halfIpdNormalizedWidth = halfIpdPx / singleViewportWidthPx; 
+		// 0.5 is texture coord value for the center eye height
+		let centerCoordL = new THREE.Vector2(1.0 - halfIpdNormalizedWidth, 0.5); // Starting from left side so 1 - halfIpdWidth
+		let centerCoordR = new THREE.Vector2(halfIpdNormalizedWidth, 0.5); // Starting from right side so just halfIpdWidth
 
 		return { L: centerCoordL, R: centerCoordR };
-
 	}
 
 	/* Event listeners */

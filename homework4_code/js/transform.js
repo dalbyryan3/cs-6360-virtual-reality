@@ -110,19 +110,19 @@ var MVPmat = function ( dispParams ) {
 	function computeTopBottomLeftRight( clipNear, clipFar, dispParams ) {
 
 		/* TODO (2.1.2) Stereo Rendering */
-		var M = dispParams.lensMagnification;
-		var d = dispParams.distanceScreenViewer;
-		var h = (dispParams.pixelPitch * dispParams.canvasHeight) * M;
-		var w1L = M * dispParams.ipd/2;
-		var w2L = M * ((dispParams.pixelPitch * dispParams.canvasWidth) - dispParams.ipd)/2;
-		var w1R = w1L;
-		var w2R = w2L;
-		var top = clipNear * h/(2*d);
-		var bottom = -top;
-		var lL = -clipNear * w2L / d;
-		var rL = clipNear * w1L / d;
-		var lR = -clipNear * w1R / d;
-		var rR = clipNear * w2R / d;
+		let M = dispParams.lensMagnification;
+		let d = dispParams.distanceScreenViewer;
+		let h = M * (dispParams.pixelPitch * dispParams.canvasHeight);
+		let w1L = M * dispParams.ipd/2;
+		let w2L = M * ((dispParams.pixelPitch * dispParams.canvasWidth) - dispParams.ipd)/2;
+		let w1R = w1L;
+		let w2R = w2L;
+		let top = clipNear * h/(2*d);
+		let bottom = -top;
+		let lL = -clipNear * w2L / d;
+		let rL = clipNear * w1L / d;
+		let lR = -clipNear * w1R / d;
+		let rR = clipNear * w2R / d;
 		// console.log({
 		// 	topL: top, bottomL: bottom, leftL: lL, rightL: rL,
 		// 	topR: top, bottomR: bottom, leftR: lR, rightR: rR,
