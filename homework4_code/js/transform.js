@@ -123,10 +123,6 @@ var MVPmat = function ( dispParams ) {
 		let rL = clipNear * w1L / d;
 		let lR = -clipNear * w1R / d;
 		let rR = clipNear * w2R / d;
-		// console.log({
-		// 	topL: top, bottomL: bottom, leftL: lL, rightL: rL,
-		// 	topR: top, bottomR: bottom, leftR: lR, rightR: rR,
-		// });
 
 		return {
 			topL: top, bottomL: bottom, leftL: lL, rightL: rL,

@@ -41,7 +41,7 @@ void main() {
 	float r_unnorm = sqrt(pow((textureCoords[0]-centerCoordinate[0])*viewportSize[0], 2.0) + pow((textureCoords[1]-centerCoordinate[1])*viewportSize[1], 2.0)); // Multiplying by viewport size changes to mm scaling
 	float r_norm = r_unnorm / distLensScreen; 
 	float skew = 1.0 + K[0]*pow(r_norm, 2.0) + K[1]*pow(r_norm, 4.0);
-	vec2 textureCoordsDistorted = textureCoords * skew; 
+	vec2 textureCoordsDistorted = (textureCoords-centerCoordinate) * skew + centerCoordinate; // Adjust textureCoord relative to centerCoord using skew
 
 	if(textureCoordsDistorted[0] < 0.0 || textureCoordsDistorted[0] >= 1.0 || textureCoordsDistorted[1] < 0.0 || textureCoordsDistorted[1] >= 1.0)
 	{
