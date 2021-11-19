@@ -76,7 +76,7 @@ void printIMUVals(bool a, bool g, bool m)
 
 void setup() {
     delay(5000); // Delay so setup Serial output can be observed
-    Serial.begin(9600);
+    Serial.begin(15200); // Will be receiving BLE data at fastest every 3 milliseconds (see delay(3)) thus up to 334 receives in a second. We receive 37 bytes so need to be able to output 12500 bytes per second (high estimate), a baud rate of 115200 gives approximately 14400 bytes per second.
 
     // BLE 
     if (!BLE.begin()){
@@ -201,6 +201,7 @@ void loop() {
     }
 
     while (peripheral.connected()) {
+        delay(3); // Delay to not overwhelm serial buffer
         if (IMUCharacteristicAcc.valueUpdated()){
             IMUCharacteristicAcc.readValue(&acc, ARDUINO_FLOAT_LENGTH_BYTES*ACC_ELEMENTS);
         }

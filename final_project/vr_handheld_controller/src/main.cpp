@@ -42,8 +42,8 @@ void setup() {
     delay(5000); // Delay so setup Serial output can be observed
     Serial.begin(9600);
 
-    // Enable pull up resistor for button
-    pinMode(BUTTON_PIN, INPUT_PULLUP);
+    // Enable button pin for input
+    pinMode(BUTTON_PIN, INPUT);
 
     // BLE
     if (!BLE.begin()){
@@ -126,7 +126,7 @@ void loop() {
                 IMUCharacteristicMag.writeValue(mag_buffer, ARDUINO_FLOAT_LENGTH_BYTES*ACC_ELEMENTS);
             }
             // Send button state
-            button_pressed = (digitalRead(BUTTON_PIN) == LOW); // Will have to find correct value for what is pressed down based on circuitry 
+            button_pressed = (digitalRead(BUTTON_PIN) == HIGH); 
             ButtonPressedCharacteristic.writeValue(button_pressed);
         }
 
