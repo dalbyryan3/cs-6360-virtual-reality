@@ -11,6 +11,7 @@ This code is the code behind the handheld VR controller that broadcasts an IMU s
 #include <Arduino_LSM9DS1.h>
 
 #define BUTTON_PIN 3
+
 #define ARDUINO_FLOAT_LENGTH_BYTES 4
 #define ACC_ELEMENTS 3
 #define GYR_ELEMENTS 3
