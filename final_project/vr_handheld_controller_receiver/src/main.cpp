@@ -10,17 +10,26 @@ This code is the code behind the bluetooth receiver of the handheld VR controlle
 #include <ArduinoBLE.h>
 #include <Arduino_LSM9DS1.h>
 
+#define ARDUINO_FLOAT_LENGTH_BYTES 4
 #define BLE_LOCAL_NAME_IMU "VRHANDHELDCONTROLLER"
 #define BLE_UUID_IMU_SERVICE "12307e98-a67e-45e2-b8f0-1445fa6e2cd8"
-#define BLE_UUID_ACC_X "cf89ef50-4bdb-423a-a822-88aaf7f96c5a"
-#define BLE_UUID_ACC_Y "fe9c88f6-b2ef-475b-9827-59890d2c087a"
-#define BLE_UUID_ACC_Z "a7a21afb-8f7e-4d1a-a7d1-e7d8f6ae9d63"
-#define BLE_UUID_GYR_X "1552ab31-afbb-418c-bd23-1f4527751390"
-#define BLE_UUID_GYR_Y "7fa5b053-f0a0-4ec2-b663-d55c1f769f85"
-#define BLE_UUID_GYR_Z "ff84445b-fd7a-4274-bf20-0b4aedbb2b97"
-#define BLE_UUID_MAG_X "55584dd1-b773-44aa-a38d-ed6d9c94a851"
-#define BLE_UUID_MAG_Y "288a9b57-c1ea-4ebd-8ac4-ee04782e614e"
-#define BLE_UUID_MAG_Z "dfe58735-f321-42df-8122-4d523c0da19c"
+#define BLE_UUID_ACC "cf89ef50-4bdb-423a-a822-88aaf7f96c5a"
+#define BLE_UUID_GYR "1552ab31-afbb-418c-bd23-1f4527751390"
+#define BLE_UUID_MAG "55584dd1-b773-44aa-a38d-ed6d9c94a851"
+
+// #define BLE_UUID_ACC_X "cf89ef50-4bdb-423a-a822-88aaf7f96c5a"
+// #define BLE_UUID_ACC_Y "fe9c88f6-b2ef-475b-9827-59890d2c087a"
+// #define BLE_UUID_ACC_Z "a7a21afb-8f7e-4d1a-a7d1-e7d8f6ae9d63"
+// #define BLE_UUID_GYR_X "1552ab31-afbb-418c-bd23-1f4527751390"
+// #define BLE_UUID_GYR_Y "7fa5b053-f0a0-4ec2-b663-d55c1f769f85"
+// #define BLE_UUID_GYR_Z "ff84445b-fd7a-4274-bf20-0b4aedbb2b97"
+// #define BLE_UUID_MAG_X "55584dd1-b773-44aa-a38d-ed6d9c94a851"
+// #define BLE_UUID_MAG_Y "288a9b57-c1ea-4ebd-8ac4-ee04782e614e"
+// #define BLE_UUID_MAG_Z "dfe58735-f321-42df-8122-4d523c0da19c"
+
+float acc[3]; // x,y,z g = 9.80665 m/s^2
+float gyr[3]; // x,y,z deg/s
+float mag[3];  // x,y,z muT (micro-Teslas)
 
 void setup() {
     delay(5000); // Delay so setup Serial output can be observed
@@ -89,31 +98,33 @@ void loop() {
         return;
     }
 
-    BLECharacteristic IMUCharacteristicAccX = peripheral.characteristic(BLE_UUID_ACC_X);
+    BLECharacteristic IMUCharacteristicAcc = peripheral.characteristic(BLE_UUID_ACC);
     
 
-    if (!IMUCharacteristicAccX){
+    if (!IMUCharacteristicAcc){
         Serial.println("Peripheral doesn't have Acc X characteristic!");
         peripheral.disconnect();
         return;
-    } else if (!IMUCharacteristicAccX.canSubscribe()){
+    } else if (!IMUCharacteristicAcc.canSubscribe()){
         Serial.println("Peripheral does not have subscribeable Acc X characteristic!");
         peripheral.disconnect();
         return;
-    } else if (!IMUCharacteristicAccX.subscribe()){
+    } else if (!IMUCharacteristicAcc.subscribe()){
         Serial.println("Did not successfully subscripe to Acc X characteristic!");
         peripheral.disconnect();
         return;
     }
 
-    float accX;
     while (peripheral.connected()) {
-        if (IMUCharacteristicAccX.valueUpdated()){
-            Serial.println("HERE 4");
-            Serial.print("Acc X val: ");
-            IMUCharacteristicAccX.readValue(&accX, 4);
-            Serial.print(accX);
-            Serial.println(" g");
+        if (IMUCharacteristicAcc.valueUpdated()){
+            IMUCharacteristicAcc.readValue(&acc, ARDUINO_FLOAT_LENGTH_BYTES*3);
+            Serial.println("Receiving:");
+            Serial.print("Acc X: ");
+            Serial.println(acc[0]);
+            Serial.print("Acc Y: ");
+            Serial.println(acc[1]);
+            Serial.print("Acc Z: ");
+            Serial.println(acc[2]);
         }
     }
 
