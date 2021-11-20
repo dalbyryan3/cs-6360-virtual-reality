@@ -27,181 +27,222 @@ float gyr[GYR_ELEMENTS] = {0}; // x,y,z deg/s
 float mag[MAG_ELEMENTS] = {0};  // x,y,z muT (micro-Teslas)
 bool buttonPressed = false;
 
+bool printForViz = false;
 bool print_a = false;
 bool print_g = false;
 bool print_m = false;
 
-void printIMUVals(bool a, bool g, bool m)
+void printIMUValsForViz(float *acc, float *gyr, float *mag, bool a, bool g, bool m)
 {
     // Will print values of Acc, Gyr, or Mag, depending on which is the first true bool is seen, if none seen prints button state
     if (a)
     {
-        Serial.print("AccX:");
+        Serial.print(F("AccX:"));
         Serial.print(acc[0]);
-        Serial.print(",");
-        Serial.print("AccY:");
+        Serial.print(F(","));
+        Serial.print(F("AccY:"));
         Serial.print(acc[1]);
-        Serial.print(",");
-        Serial.print("AccZ:");
+        Serial.print(F(","));
+        Serial.print(F("AccZ:"));
         Serial.println(acc[2]);
     }
     else if (g)
     {
-        Serial.print("GyrX:");
+        Serial.print(F("GyrX:"));
         Serial.print(gyr[0]);
-        Serial.print(",");
-        Serial.print("GyrY:");
+        Serial.print(F(","));
+        Serial.print(F("GyrY:"));
         Serial.print(gyr[1]);
-        Serial.print(",");
-        Serial.print("GyrZ:");
+        Serial.print(F(","));
+        Serial.print(F("GyrZ:"));
         Serial.println(gyr[2]);
     }
     else if (m)
     {
-        Serial.print("MagX:");
+        Serial.print(F("MagX:"));
         Serial.print(mag[0]);
-        Serial.print(",");
-        Serial.print("MagY:");
+        Serial.print(F(","));
+        Serial.print(F("MagY:"));
         Serial.print(mag[1]);
-        Serial.print(",");
-        Serial.print("MagZ:");
+        Serial.print(F(","));
+        Serial.print(F("MagZ:"));
         Serial.println(mag[2]);
     }
     else
     {
-        Serial.print("Button state:");
+        Serial.print(F("Button state:"));
         Serial.println(buttonPressed);
     }
 }
 
+void printIMUVals(float *acc, float *gyr, float *mag)
+{
+    // Prints button state, accelerometer data, gyroscope data, and magnetometer data sequentially
+    Serial.print(buttonPressed);
+    Serial.print(F(";"));
+
+    Serial.print(acc[0]);
+    Serial.print(F(";"));
+    Serial.print(acc[1]);
+    Serial.print(F(";"));
+    Serial.print(acc[2]);
+    Serial.print(F(";"));
+
+    Serial.print(gyr[0]);
+    Serial.print(F(";"));
+    Serial.print(gyr[1]);
+    Serial.print(F(";"));
+    Serial.print(gyr[2]);
+    Serial.print(F(";"));
+
+    Serial.print(mag[0]);
+    Serial.print(F(";"));
+    Serial.print(mag[1]);
+    Serial.print(F(";"));
+    Serial.print(mag[2]);
+
+    Serial.println(F(""));
+}
+
 void setup() {
     delay(5000); // Delay so setup Serial output can be observed
-    Serial.begin(15200); // Will be receiving BLE data at fastest every 3 milliseconds (see delay(3)) thus up to 334 receives in a second. We receive 37 bytes so need to be able to output 12500 bytes per second (high estimate), a baud rate of 115200 gives approximately 14400 bytes per second.
+    Serial.begin(15200); 
+    while (!Serial); // Wait if serial is not ready- may want to change this but for training this is useful so doesn't start until serial connection is made
+
+    Serial.println(F("Press y in next 3 seconds for visualization print out"));
+    delay(3000);
+    if (Serial.available())
+    {
+        char data = Serial.read();
+        if (data == 'y'){
+            printForViz = true;
+        }
+    }
 
     // BLE 
     if (!BLE.begin()){
-        Serial.println("Starting BLE module failed!");
+        Serial.println(F("Starting BLE module failed!"));
         while (1);
     }
-    Serial.println("***Started BLE module***");
+    Serial.println(F("***Started BLE module***"));
 
     BLE.advertise();  
-    Serial.println("Started BLE advertising");
+    Serial.println(F("Started BLE advertising"));
 
-    Serial.println("***BLE initialization complete***");
+    Serial.println(F("***BLE initialization complete***"));
     Serial.println();
     Serial.println();
 
     BLE.scanForUuid(BLE_UUID_IMU_SERVICE);
-    Serial.println("Started scanning for uuid");
+    Serial.println(F("Started scanning for uuid"));
 }
 
 
 void loop() {
     BLEDevice peripheral = BLE.available();
-    Serial.println("Discovering peripheral device");
+    Serial.println(F("Discovering peripheral device"));
     // Exit loop() until peripheral is found (Note loop() will be called again, so like calling continue)
     if (!peripheral){
         return;
     }
 
-    Serial.println("***Peripheral device discovered***");
-    Serial.print("MAC address: ");
+    Serial.println(F("***Peripheral device discovered***"));
+    Serial.print(F("MAC address: "));
     Serial.println(peripheral.address());
-    Serial.print("Device name: ");
+    Serial.print(F("Device name: "));
     Serial.println(peripheral.localName());
-    Serial.print("Advertised service UUID: ");
+    Serial.print(F("Advertised service UUID: "));
     Serial.println(peripheral.advertisedServiceUuid());
     Serial.println();
 
     if (peripheral.localName() != BLE_LOCAL_NAME_IMU){
-        Serial.println("Incorrect local name");
+        Serial.println(F("Incorrect local name"));
         return;
     }
 
     BLE.stopScan();
 
-    Serial.println("Connecting to peripheral device");
+    Serial.println(F("Connecting to peripheral device"));
     if (peripheral.connect()){
-        Serial.println("Connected to peripheral device");
+        Serial.println(F("Connected to peripheral device"));
     }
     else{
-        Serial.println("Failed to connect to peripheral device");
+        Serial.println(F("Failed to connect to peripheral device"));
         return;
     }
 
-    Serial.println("Discovering peripheral device attributes");
+    Serial.println(F("Discovering peripheral device attributes"));
     if (peripheral.discoverAttributes()){
-        Serial.println("Peripheral device attributes discovered");
+        Serial.println(F("Peripheral device attributes discovered"));
     }
     else{
-        Serial.println("Failed to discover peripheral device attributes");
+        Serial.println(F("Failed to discover peripheral device attributes"));
         peripheral.disconnect();
         return;
     }
 
     BLECharacteristic IMUCharacteristicAcc = peripheral.characteristic(BLE_UUID_ACC);
     if (!IMUCharacteristicAcc){
-        Serial.println("Peripheral doesn't have Acc characteristic!");
+        Serial.println(F("Peripheral doesn't have Acc characteristic!"));
         peripheral.disconnect();
         return;
     } else if (!IMUCharacteristicAcc.canSubscribe()){
-        Serial.println("Peripheral does not have subscribeable Acc characteristic!");
+        Serial.println(F("Peripheral does not have subscribeable Acc characteristic!"));
         peripheral.disconnect();
         return;
     } else if (!IMUCharacteristicAcc.subscribe()){
-        Serial.println("Did not successfully subscribe to Acc characteristic!");
+        Serial.println(F("Did not successfully subscribe to Acc characteristic!"));
         peripheral.disconnect();
         return;
     }
 
     BLECharacteristic IMUCharacteristicGyr = peripheral.characteristic(BLE_UUID_GYR);
     if (!IMUCharacteristicGyr){
-        Serial.println("Peripheral doesn't have Gyr characteristic!");
+        Serial.println(F("Peripheral doesn't have Gyr characteristic!"));
         peripheral.disconnect();
         return;
     } else if (!IMUCharacteristicGyr.canSubscribe()){
-        Serial.println("Peripheral does not have subscribeable Gyr characteristic!");
+        Serial.println(F("Peripheral does not have subscribeable Gyr characteristic!"));
         peripheral.disconnect();
         return;
     } else if (!IMUCharacteristicGyr.subscribe()){
-        Serial.println("Did not successfully subscribe to Gyr characteristic!");
+        Serial.println(F("Did not successfully subscribe to Gyr characteristic!"));
         peripheral.disconnect();
         return;
     }
 
     BLECharacteristic IMUCharacteristicMag = peripheral.characteristic(BLE_UUID_MAG);
     if (!IMUCharacteristicMag){
-        Serial.println("Peripheral doesn't have Mag characteristic!");
+        Serial.println(F("Peripheral doesn't have Mag characteristic!"));
         peripheral.disconnect();
         return;
     } else if (!IMUCharacteristicMag.canSubscribe()){
-        Serial.println("Peripheral does not have subscribeable Mag characteristic!");
+        Serial.println(F("Peripheral does not have subscribeable Mag characteristic!"));
         peripheral.disconnect();
         return;
     } else if (!IMUCharacteristicMag.subscribe()){
-        Serial.println("Did not successfully subscribe to Mag characteristic!");
+        Serial.println(F("Did not successfully subscribe to Mag characteristic!"));
         peripheral.disconnect();
         return;
     }
 
     BLECharacteristic ButtonPressedCharacteristic = peripheral.characteristic(BLE_UUID_BUTTON);
     if (!ButtonPressedCharacteristic){
-        Serial.println("Peripheral doesn't have Button Pressed characteristic!");
+        Serial.println(F("Peripheral doesn't have Button Pressed characteristic!"));
         peripheral.disconnect();
         return;
     } else if (!ButtonPressedCharacteristic.canSubscribe()){
-        Serial.println("Peripheral does not have subscribeable Button Pressed characteristic!");
+        Serial.println(F("Peripheral does not have subscribeable Button Pressed characteristic!"));
         peripheral.disconnect();
         return;
     } else if (!ButtonPressedCharacteristic.subscribe()){
-        Serial.println("Did not successfully subscribe to Button Pressed characteristic!");
+        Serial.println(F("Did not successfully subscribe to Button Pressed characteristic!"));
         peripheral.disconnect();
         return;
     }
 
     while (peripheral.connected()) {
-        delay(3); // Delay to not overwhelm serial buffer
+        delay(5); // Delay to not overwhelm serial buffer
         if (IMUCharacteristicAcc.valueUpdated()){
             IMUCharacteristicAcc.readValue(&acc, ARDUINO_FLOAT_LENGTH_BYTES*ACC_ELEMENTS);
         }
@@ -214,26 +255,33 @@ void loop() {
         if (ButtonPressedCharacteristic.valueUpdated()){
             ButtonPressedCharacteristic.readValue(&buttonPressed, ARDUINO_BOOL_LENGTH_BYTES);
         }
-        if (Serial.available())
+        if (printForViz)
         {
-            char data = Serial.read();
-            if (data == 'a'){
-                print_a = !print_a;
+            if (Serial.available())
+            {
+                char data = Serial.read();
+                if (data == 'a'){
+                    print_a = !print_a;
+                }
+                if (data == 'g'){
+                    print_g = !print_g;
+                }
+                if (data == 'm'){
+                    print_m = !print_m;
+                }
             }
-            if (data == 'g'){
-                print_g = !print_g;
-            }
-            if (data == 'm'){
-                print_m = !print_m;
-            }
+            printIMUValsForViz(acc, gyr, mag, print_a, print_g, print_m);
         }
-        printIMUVals(print_a, print_g, print_m);
+        else
+        {
+            printIMUVals(acc, gyr, mag);
+        }
     }
 
-    Serial.println("***Peripheral device disconnected***");
+    Serial.println(F("***Peripheral device disconnected***"));
     Serial.println();
     Serial.println();
 
     BLE.scanForUuid(BLE_UUID_IMU_SERVICE);
-    Serial.println("Started scanning for uuid");
+    Serial.println(F("Started scanning for uuid"));
 }
