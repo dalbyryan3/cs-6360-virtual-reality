@@ -6,6 +6,10 @@ Ryan Dalby- CS 6360 Virtual Reality Final Project
 This code is the code behind the bluetooth receiver of the handheld VR controller demonstrating bluetooth functionality.
 */
 
+// To prevent serial monitor crashes after a few minutes will have to explore:
+//  Adding pairity bit to serial communication
+//  Exploring if SRAM is being run out of on the Arduino (memory leak, likely check integrity of arrays(acc, gyr, mag) too by directly seeing integrity of the array right before crash)
+
 #include <Arduino.h>
 #include <ArduinoBLE.h>
 #include <Arduino_LSM9DS1.h>
