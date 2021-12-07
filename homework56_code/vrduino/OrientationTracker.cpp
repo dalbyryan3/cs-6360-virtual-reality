@@ -28,7 +28,17 @@ OrientationTracker::OrientationTracker(double imuFilterAlphaIn,  bool simulateIm
 }
 
 void OrientationTracker::initImu() {
-  imu.init();
+  Wire1.setSCL(ICM_SCL);
+  Wire1.setSDA(ICM_SDA);
+  Wire1.begin(ICM_ADR);
+
+  // Try to initialize!
+  if (!imu.begin_I2C(ICM_ADR, &Wire1)) {
+    Serial.println("Failed to find ICM20948 chip");
+    while (1) {
+      delay(10);
+    }
+  }
 }
 
 
@@ -125,10 +135,11 @@ void OrientationTracker::updateImuVariablesFromSimulation() {
 bool OrientationTracker::updateImuVariables() {
 
   //sample imu values
-  if (!imu.read()) {
-  // return false if there's no data
-    return false;
-  }
+  sensors_event_t accel;
+  sensors_event_t gyro;
+  sensors_event_t mag;
+  sensors_event_t temp;
+  imu.getEvent(&accel, &gyro, &temp, &mag);
 
   //call micros() to get current time in microseconds
   //update:
@@ -141,13 +152,13 @@ bool OrientationTracker::updateImuVariables() {
   //acc[0], ...
 
   // You also need to appropriately modify the update of gyr as instructed in (2.1.3).
-  gyr[0] = imu.gyrX;
-  gyr[1] = imu.gyrY;
-  gyr[2] = imu.gyrZ;
+  gyr[0] = gyro.gyro.x;
+  gyr[1] = gyro.gyro.y;
+  gyr[2] = gyro.gyro.z;
 
-  acc[0] = imu.accX;
-  acc[1] = imu.accY;
-  acc[2] = imu.accZ;
+  acc[0] = accel.acceleration.x;
+  acc[1] = accel.acceleration.y;
+  acc[2] = accel.acceleration.z;
 
   return true;
 

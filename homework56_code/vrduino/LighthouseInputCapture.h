@@ -78,7 +78,7 @@
 
 #pragma once
 
-#include "InputCapture.h"
+#include "PulsePosition.h"
 #include "LighthouseOOTX.h"
 #include "PulseData.h"
 #include <Arduino.h>
@@ -94,7 +94,7 @@
 #endif
 #endif
 
-class LighthouseInputCapture : public InputCapture {
+class LighthouseInputCapture : public PulsePositionInput {
 
   public:
    /**

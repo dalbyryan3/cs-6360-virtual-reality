@@ -8,7 +8,7 @@
 #include "TestPose.h"
 #include "PoseTracker.h"
 #include "PoseMath.h"
-#include "InputCapture.h"
+#include "PulsePosition.h"
 
 const unsigned int kOutputStringWidth = 40;
 
@@ -22,7 +22,7 @@ OrientationTracker tracker(alphaImuFilter, simulateImu);
 //HW06
 //complementary filter value [0,1].
 //1: ignore acc tilt, 0: use all acc tilt
-double alphaImuFilter = 0.99;
+//double alphaImuFilter = 0.99;
 
 //get simulated lighthouse timings (to test without physical lighthouse)
 bool simulateLighthouse = false;
@@ -38,7 +38,7 @@ const int C = 2;
 int baseStationMode = A;
 
 
-PoseTracker tracker(alphaImuFilter, baseStationMode, simulateLighthouse);
+//PoseTracker tracker(alphaImuFilter, baseStationMode, simulateLighthouse);
 
 void setup() {
 
@@ -808,4 +808,3 @@ void updatePosePrint() {
 void loop() {
 
 }
-

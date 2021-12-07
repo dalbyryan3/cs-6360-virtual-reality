@@ -21,10 +21,17 @@
  */
 
 #pragma once
-#include "Imu.h"
+#include <Adafruit_ICM20X.h>
+#include <Adafruit_ICM20948.h>
+#include <Adafruit_Sensor.h>
+#include <Wire.h>
 #include "Quaternion.h"
 #include "OrientationMath.h"
 #include "simulatedImuData.h"
+
+#define ICM_ADR 0x68
+#define ICM_SCL 16
+#define ICM_SDA 17
 
 class OrientationTracker {
 
@@ -217,7 +224,7 @@ class OrientationTracker {
 
 
     /** Imu class for sampling from IMU */
-    Imu imu;
+    Adafruit_ICM20948 imu;
 
 
     /**

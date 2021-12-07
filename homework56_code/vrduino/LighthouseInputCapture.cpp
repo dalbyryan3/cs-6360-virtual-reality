@@ -1,4 +1,5 @@
 #include "LighthouseInputCapture.h"
+#define CLOCKS_PER_MICROSECOND 
 
 LighthouseInputCapture::LighthouseInputCapture( int pinIn, int polarityIn, int sensorIndexIn, PulseData* pulseDataIn) :
 
@@ -9,7 +10,7 @@ LighthouseInputCapture::LighthouseInputCapture( int pinIn, int polarityIn, int s
 {
 
   // start timer (from Base InputCapture)
-  begin(pinIn, polarity);
+  begin(pinIn);
   //pulseData[0]->baseStationMode = 0;
 
 }
@@ -36,7 +37,8 @@ void LighthouseInputCapture::callback(uint32_t value) {
   float pulseLengthUS;
   bool skipBit, dataBit, axisBit;
 
-  if (pulseLengthTicks <= 60 * CLOCKS_PER_MICROSECOND) {
+  // TODO: Check this 3600 
+  if (pulseLengthTicks <= 60 * (150.4)) {
 
     //decode quickly if sweep pulse, without going into decode function.
     pulseType = 0;
