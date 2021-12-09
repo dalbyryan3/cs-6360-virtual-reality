@@ -80,11 +80,15 @@ var MVPmat = function ( dispParams ) {
 				- viewerPosition.y,
 				- viewerPosition.z );
 
+		// var rotationMat = new THREE.Matrix4().lookAt().transpose();
+		var rotationMat = new THREE.Matrix4().makeRotationFromQuaternion(state.imuQuaternion);
+
 		var ipdTranslateMat =
 			new THREE.Matrix4().makeTranslation( halfIpdShift, 0, 0 );
 
 		var viewMat = new THREE.Matrix4()
 			.premultiply( translationMat )
+			.premultiply( rotationMat )
 			.premultiply( ipdTranslateMat );
 
 		return viewMat;

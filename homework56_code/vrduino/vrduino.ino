@@ -28,7 +28,7 @@ OrientationTracker tracker(alphaImuFilter, simulateImu);
 bool simulateLighthouse = false;
 
 //if test is true, then run tests in Test.cpp and exit
-bool test = true;
+bool test = false;
 
 //mode of base station
 //0:A, 1:B, 2: C
@@ -806,5 +806,30 @@ void updatePosePrint() {
 
 
 void loop() {
+  if (!test)
+  {
+    bool imuTrack = false;
+
+    imuTrack = tracker.processImu();
+
+    const Quaternion& quaternionComp = tracker.getQuaternionComp();
+    // const double *gyro = tracker.getGyr();
+    // const double *acc = tracker.getAcc();
+
+    if (imuTrack == 1) {
+      //print quaternion from imu
+      Serial.printf("QC %.3f %.3f %.3f %.3f\n",
+      quaternionComp.q[0], quaternionComp.q[1],
+      quaternionComp.q[2], quaternionComp.q[3]);
+
+    }
+
+    // Serial.printf("Gyro %.3f %.3f %.3f\n",
+    // gyro[0], gyro[1], gyro[2]);
+    // Serial.printf("Acc %.3f %.3f %.3f\n",
+    // acc[0], acc[1], acc[2]);
+
+    //delay(100);
+  }
 
 }
