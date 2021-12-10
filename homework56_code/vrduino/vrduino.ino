@@ -28,7 +28,7 @@ OrientationTracker tracker(alphaImuFilter, simulateImu);
 bool simulateLighthouse = false;
 
 //if test is true, then run tests in Test.cpp and exit
-bool test = false;
+bool test = true;
 
 //mode of base station
 //0:A, 1:B, 2: C
@@ -84,6 +84,11 @@ void setup() {
   testGetRtFromH();
   testGetQuaternionFromRotationMatrixSimple();
   testGetQuaternionFromRotationMatrix();
+
+  // For beginning outputting quaternion to serial port in loop
+  delay(5000);
+  tracker.resetOrientation();
+  tracker.measureImuBiasVariance();
 }
 
 void testBiasVariance() {
