@@ -6,9 +6,10 @@ Ryan Dalby- CS 6360 Virtual Reality Final Project
 This code is the code behind the bluetooth receiver of the handheld VR controller demonstrating bluetooth functionality.
 */
 
-// To prevent serial monitor crashes after a few minutes will have to explore:
-//  Adding pairity bit to serial communication
-//  Exploring if SRAM is being run out of on the Arduino (memory leak, likely check integrity of arrays(acc, gyr, mag) too by directly seeing integrity of the array right before crash)
+// Serial monitor issues (crashes after few minutes randomly... likely some SRAM buffer issue, potentially board firmware needs update...) may be related to:
+// https://forum.arduino.cc/t/long-print-crashing-on-arduino-nano-33-ble/682887/3
+// or https://forum.arduino.cc/t/trouble-with-serial-output/619729/4 
+
 
 #include <Arduino.h>
 #include <ArduinoBLE.h>
@@ -26,9 +27,9 @@ This code is the code behind the bluetooth receiver of the handheld VR controlle
 #define BLE_UUID_MAG "55584dd1-b773-44aa-a38d-ed6d9c94a851"
 #define BLE_UUID_BUTTON "017fa2e8-b256-47bf-953b-a494b75fb9bf"
 
-float acc[ACC_ELEMENTS] = {0}; // x,y,z g = 9.80665 m/s^2
-float gyr[GYR_ELEMENTS] = {0}; // x,y,z deg/s
-float mag[MAG_ELEMENTS] = {0};  // x,y,z muT (micro-Teslas)
+float acc[ACC_ELEMENTS] = {0.0,0.0,0.0}; // x,y,z g = 9.80665 m/s^2
+float gyr[GYR_ELEMENTS] = {0.0,0.0,0.0}; // x,y,z deg/s
+float mag[MAG_ELEMENTS] = {0.0,0.0,0.0};  // x,y,z muT (micro-Teslas)
 bool buttonPressed = false;
 
 bool printForViz = false;
@@ -38,39 +39,48 @@ bool print_m = false;
 
 void printIMUValsForViz(float *acc, float *gyr, float *mag, bool a, bool g, bool m)
 {
+    float accX = acc[0];
+    float accY = acc[1];
+    float accZ = acc[2];
+    float gyrX = gyr[0];
+    float gyrY = gyr[1];
+    float gyrZ = gyr[2];
+    float magX = mag[0];
+    float magY = mag[1];
+    float magZ = mag[2];
     // Will print values of Acc, Gyr, or Mag, depending on which is the first true bool is seen, if none seen prints button state
     if (a)
     {
         Serial.print(F("AccX:"));
-        Serial.print(acc[0]);
+        Serial.print(accX);
         Serial.print(F(","));
         Serial.print(F("AccY:"));
-        Serial.print(acc[1]);
+        Serial.print(accY);
         Serial.print(F(","));
         Serial.print(F("AccZ:"));
-        Serial.println(acc[2]);
+        Serial.println(accZ);
     }
     else if (g)
     {
         Serial.print(F("GyrX:"));
-        Serial.print(gyr[0]);
+        Serial.print(gyrX);
         Serial.print(F(","));
         Serial.print(F("GyrY:"));
-        Serial.print(gyr[1]);
+        Serial.print(gyrY);
         Serial.print(F(","));
         Serial.print(F("GyrZ:"));
-        Serial.println(gyr[2]);
+        Serial.println(gyrZ);
     }
     else if (m)
     {
         Serial.print(F("MagX:"));
-        Serial.print(mag[0]);
+        Serial.print(magX);
         Serial.print(F(","));
         Serial.print(F("MagY:"));
-        Serial.print(mag[1]);
+        Serial.print(magY);
         Serial.print(F(","));
         Serial.print(F("MagZ:"));
-        Serial.println(mag[2]);
+        Serial.println(magZ);
     }
     else
     {
@@ -82,30 +92,41 @@ void printIMUValsForViz(float *acc, float *gyr, float *mag, bool a, bool g, bool
 void printIMUVals(float *acc, float *gyr, float *mag)
 {
     // Prints button state, accelerometer data, gyroscope data, and magnetometer data sequentially
-    Serial.print(buttonPressed);
+    float accX = acc[0];
+    float accY = acc[1];
+    float accZ = acc[2];
+    float gyrX = gyr[0];
+    float gyrY = gyr[1];
+    float gyrZ = gyr[2];
+    float magX = mag[0];
+    float magY = mag[1];
+    float magZ = mag[2];
+    bool buttonIsPressed = buttonPressed;
+
+    Serial.print(buttonIsPressed);
     Serial.print(F(";"));
 
-    Serial.print(acc[0]);
+    Serial.print(accX);
     Serial.print(F(";"));
-    Serial.print(acc[1]);
+    Serial.print(accY);
     Serial.print(F(";"));
-    Serial.print(acc[2]);
-    Serial.print(F(";"));
-
-    Serial.print(gyr[0]);
-    Serial.print(F(";"));
-    Serial.print(gyr[1]);
-    Serial.print(F(";"));
-    Serial.print(gyr[2]);
+    Serial.print(accZ);
     Serial.print(F(";"));
 
-    Serial.print(mag[0]);
+    Serial.print(gyrX);
     Serial.print(F(";"));
-    Serial.print(mag[1]);
+    Serial.print(gyrY);
     Serial.print(F(";"));
-    Serial.print(mag[2]);
+    Serial.print(gyrZ);
+    Serial.print(F(";"));
 
-    Serial.println(F(""));
+    Serial.print(magX);
+    Serial.print(F(";"));
+    Serial.print(magY);
+    Serial.print(F(";"));
+    Serial.print(magZ);
+
+    Serial.println();
 }
 
 void setup() {

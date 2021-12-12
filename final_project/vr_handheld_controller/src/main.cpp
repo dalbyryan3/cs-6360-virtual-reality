@@ -23,12 +23,13 @@ This code is the code behind the handheld VR controller that broadcasts an IMU s
 #define BLE_UUID_MAG "55584dd1-b773-44aa-a38d-ed6d9c94a851"
 #define BLE_UUID_BUTTON "017fa2e8-b256-47bf-953b-a494b75fb9bf"
 
+typedef unsigned char uint8_t;
 
-float acc[ACC_ELEMENTS] = {0}; // x,y,z g = 9.80665 m/s^2
+float acc[ACC_ELEMENTS] = {0.0,0.0,0.0}; // x,y,z g = 9.80665 m/s^2      
 uint8_t *acc_buffer = (uint8_t *) acc;
-float gyr[GYR_ELEMENTS] = {0}; // x,y,z deg/s
+float gyr[GYR_ELEMENTS] = {0.0,0.0,0.0}; // x,y,z deg/s
 uint8_t *gyr_buffer = (uint8_t *) gyr;
-float mag[MAG_ELEMENTS] = {0};  // x,y,z muT (micro-Teslas)
+float mag[MAG_ELEMENTS] = {0.0,0.0,0.0};  // x,y,z muT (micro-Teslas)
 uint8_t *mag_buffer = (uint8_t *) mag;
 bool button_pressed = false;
 
