@@ -85,7 +85,9 @@ var StateController = function ( dispParams ) {
 
 		hnmodel: false,
 
-		connectionMsg: ''
+		connectionMsg: '',
+
+		lastGestureDetected: -1
 
 	};
 
@@ -372,6 +374,39 @@ var StateController = function ( dispParams ) {
 
 	}
 
+	/* Gesture extension code */
+	// Label 1 = zero-based label 0 = up
+	// Label 2 = zero-based label 1 = right
+	// Label 3 = zero-based label 2 = down
+	// Label 4 = zero-based label 3 = left
+	// Label 5 = zero-based label 4 = circle
+	// Label 6 = zero-based label 5 = x
+	setInterval(() => {
+		switch (_this.state.lastGestureDetected) {
+			case 0:
+				_this.state.modelRotation.x -= 1; // Up
+				break;
+			case 1:
+				_this.state.modelRotation.y += 1; // Right
+				break;
+			case 2:
+				_this.state.modelRotation.x += 1; // Down
+				break;
+			case 3:
+				_this.state.modelRotation.y -= 1; // Left
+				break;
+			case 4: // Reset position and keep still // circle 
+				_this.state.modelRotation = new THREE.Vector2(); 
+				break;
+			default: // Do nothing // x or anything else
+		}
+	}, 10);
+
+	setInterval(async () => {
+		const json_response = await fetch('http://127.0.0.1:5151/currentprediction')
+		.then(response => response.json());
+		_this.state.lastGestureDetected = json_response['currentprediction'];
+	}, 1);
 
 
 	/* Expose as public functions */

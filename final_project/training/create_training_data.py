@@ -60,9 +60,9 @@ if __name__ == '__main__':
     print('Training for label {0}'.format(label))
     labelling_loop(label)
 
-# Label 1 = up
-# Label 2 = right
-# Label 3 = down
-# Label 4 = left
-# Label 5 = circle
-# Label 6 = x
+# Label 1 (zero-based label 0) = up
+# Label 2  (zero-based label 1) = right
+# Label 3  (zero-based label 2) = down
+# Label 4  (zero-based label 3) = left
+# Label 5  (zero-based label 4) = circle
+# Label 6  (zero-based label 5) = x

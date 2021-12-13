@@ -28,7 +28,7 @@ OrientationTracker tracker(alphaImuFilter, simulateImu);
 bool simulateLighthouse = false;
 
 //if test is true, then run tests in Test.cpp and exit
-bool test = true;
+bool test = false;
 
 //mode of base station
 //0:A, 1:B, 2: C

@@ -1,3 +1,11 @@
+# For reference:
+# Label 1 = zero-based label 0 = up
+# Label 2 = zero-based label 1 = right
+# Label 3 = zero-based label 2 = down
+# Label 4 = zero-based label 3 = left
+# Label 5 = zero-based label 4 = circle
+# Label 6 = zero-based label 5 = x
+
 import serial
 import time
 import numpy as np
@@ -10,6 +18,7 @@ from training.create_training_data import next_vals, default_vals, save_csv
 from flask import Flask, json, jsonify
 import time
 import threading
+import logging
 
 def make_prediction(model, features):
     model.eval()
@@ -56,13 +65,18 @@ server_port = 5151
 
 app = Flask(__name__)
 
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
+
 @app.route("/", methods=['GET'])
 def home():
     return "<p>VR Handheld Controller Gesture Predictor API</p>"
 @app.route("/currentprediction", methods=['GET'])
 def give_current_prediction():
     global current_prediction_dict
-    return jsonify(current_prediction_dict)
+    current_prediction_json = jsonify(current_prediction_dict)
+    current_prediction_json.headers.add('Access-Control-Allow-Origin', '*')
+    return current_prediction_json
 
 def run_app_server():
     app.run(debug=False, threaded=True, host=server_ip, port=server_port)
